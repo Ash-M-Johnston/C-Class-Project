@@ -10,9 +10,11 @@
 
 #include "file.h"
 
-int run_server(int var1) {
+int run_server(int sent_file) {
+    int debug = 0;
+
     int server_fd, client_fd;
-    //TODO Process ID, child processes
+    //TODO child processes
     pid_t pid;
     //What is sent to the client
     char string_buffer[MAX_LENGTH];
@@ -24,9 +26,9 @@ int run_server(int var1) {
         return 1;
     }
 
-    //Memset to clear the junk values stored in the memory address
+    //Memset to clear the junk values stored in the memory address, just in case
     memset(&server_address, 0, sizeof(server_address));
-    if (get_file_contents(FIRST_FILE, string_buffer) != 0) {
+    if (get_file_contents(sent_file, string_buffer) != 0) {
         fprintf(stderr, "Failed to read file contents. Aborting...\n");
         return 1;
     }
@@ -64,9 +66,12 @@ int run_server(int var1) {
         // pid = fork(); TODO
 
         printf("sending \"%s\"\n", string_buffer);
+        //Send string on buffer to client
         send(client_fd, &string_buffer, strlen(string_buffer) * sizeof(char), 0);
+        //Shut down socket gracefully
+        shutdown(client_fd, SHUT_WR);
+        //Finally, close socket
         close(client_fd);
-
     }
     //close listening socket
     close(server_fd);
