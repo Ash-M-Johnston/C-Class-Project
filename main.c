@@ -94,6 +94,7 @@ int main(int argc, char **argv) {
         printf("%s from ip %s\n", "Received request...", ip);
         // pid = fork(); concurrent, look into this
 
+        printf("sending \"%s\"\n", string_buffer);
         send(client_fd, &string_buffer, strlen(string_buffer) * sizeof(char), 0);
         close(client_fd);
 
