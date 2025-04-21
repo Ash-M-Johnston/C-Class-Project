@@ -3,28 +3,37 @@
 #include <stdio.h>
 #include <string.h>
 
-void get_file_contents(const int selected, char* buffer) {
-    char filename[50] ="../";
+int get_file_contents(const FileType selected, char* buffer) {
+    char filename[50] ="../files/";
     switch (selected) {
-        case FIRST:
+        case FIRST_FILE:
             strcat(filename, "first.txt");
             break;
-        case SECOND:
+        case SECOND_FILE:
             strcat(filename, "second.txt");
             break;
-        case THIRD:
+        case THIRD_FILE:
             strcat(filename, "third.txt");
             break;
         default:
-            strcat(filename, "unknown.txt");
-            printf("Unknown selected number %d. Try again with 0-2", selected);
-            break;
+            fprintf(stderr, "Unknown selected number %d. Try again with 0-2.", selected);
+            return 1;
     }
     FILE* file = fopen(filename, "r");
     if (file == NULL) {
-        printf("Error opening file\n");
-        return;
+        fprintf(stderr, "Error opening file, attempting workaround...\n");
+        char *ptr = &filename[0];
+        file = fopen(ptr, "r");
+        if (file == NULL) {
+            printf("Workaround failed.\n");
+            return 1;
+        }
     }
-    while (fgets(buffer, MAX_LENGTH, file)) {}
+    //Copy to buffer
+    char temp[MAX_LENGTH];
+    while (fgets(temp, MAX_LENGTH, file)) {
+        strcat(buffer, temp);
+    }
     fclose(file);
+    return 0;
 }

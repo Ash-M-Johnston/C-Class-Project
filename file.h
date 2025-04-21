@@ -2,11 +2,11 @@
 #define FILE_H
 
 typedef enum {
-    FIRST,
-    SECOND,
-    THIRD
+    FIRST_FILE,
+    SECOND_FILE,
+    THIRD_FILE
 } FileType;
 
-void get_file_contents(int selected, char* buffer);
+int get_file_contents(FileType selected, char* buffer);
 
 #endif //FILE_H
