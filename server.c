@@ -12,10 +12,10 @@
 
 int run_server(int var1) {
     int server_fd, client_fd;
-    //todo Process ID, multiple processes
+    //TODO Process ID, child processes
     pid_t pid;
     //What is sent to the client
-    char string_buffer[MAX_LENGTH]; //*****3*******
+    char string_buffer[MAX_LENGTH];
     socklen_t client_address_length;
     struct sockaddr_in server_address, client_address;
 
@@ -31,7 +31,6 @@ int run_server(int var1) {
         return 1;
     }
 
-
     //**Set the server information**
     //AF_INET means it's using IPv4
     server_address.sin_family = AF_INET;
@@ -42,9 +41,11 @@ int run_server(int var1) {
 
     if (bind(server_fd, (struct sockaddr*) &server_address, sizeof(server_address)) == -1) {
         fprintf(stderr, "Bind failed with code %d: %s\n", errno, strerror(errno));
+        close(server_fd);
         return 1;
     }
-    int option=1;
+    //True
+    int option = 1;
     //Allow reuse of local addresses, causes errors if not set to true
     setsockopt(server_fd,SOL_SOCKET,SO_REUSEADDR,(char *)&option,sizeof(option));
     //Start listening for anyone attempting to connect
@@ -60,7 +61,7 @@ int run_server(int var1) {
         }
         char *ip = inet_ntoa(client_address.sin_addr);
         printf("%s from ip %s\n", "Received request...", ip);
-        // pid = fork(); todo
+        // pid = fork(); TODO
 
         printf("sending \"%s\"\n", string_buffer);
         send(client_fd, &string_buffer, strlen(string_buffer) * sizeof(char), 0);
