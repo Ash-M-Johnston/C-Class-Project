@@ -7,4 +7,6 @@ add_executable(Project main.c
         server.c
         server.h
         file.c
-        file.h)
+        file.h
+        env.c
+        env.h)

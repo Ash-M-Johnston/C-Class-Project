@@ -2,18 +2,18 @@
 #include "server.h"
 #include <stdio.h>
 #include <string.h>
-
+//todo pass the file location to here instead of this jank
 int get_file_contents(const FileType selected, char* buffer) {
-    char filename[50] ="../files/";
+    char filename[100] = "../files/";
     switch (selected) {
-        case FIRST_FILE:
-            strcat(filename, "first.txt");
+        case TEXT_FILE:
+            strcat(filename, "plain_text.txt");
             break;
-        case SECOND_FILE:
+        case IMAGE:
             strcat(filename, "second.txt");
             break;
-        case THIRD_FILE:
-            strcat(filename, "third.txt");
+        case HTML_FILE:
+            strcat(filename, "html_example.html");
             break;
         default:
             fprintf(stderr, "Unknown selected number %d. Try again with 0-2.", selected);
@@ -21,16 +21,13 @@ int get_file_contents(const FileType selected, char* buffer) {
     }
     FILE* file = fopen(filename, "r");
     if (file == NULL) {
-        fprintf(stderr, "Error opening file, attempting workaround...\n");
-        char *ptr = &filename[0];
-        file = fopen(ptr, "r");
-        if (file == NULL) {
-            printf("Workaround failed.\n");
-            return 1;
-        }
+        fprintf(stderr, "Error opening file at location \"%s\".\n", filename);
+        return 1;
     }
     //Copy to buffer
     char temp[MAX_LENGTH];
+    snprintf(buffer, "%s", temp);
+    strcat(buffer,"HTTP/1.1 200 OK\r\nContent-Type: text/html\r\n\r\n");
     while (fgets(temp, MAX_LENGTH, file)) {
         strcat(buffer, temp);
     }

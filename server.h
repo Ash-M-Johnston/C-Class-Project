@@ -8,6 +8,6 @@
 
 #define MAX_CONNECTIONS 10
 
-int run_server(int var1);
+int run_server(int sent_file, const char* filename);
 
 #endif //SERVER_H

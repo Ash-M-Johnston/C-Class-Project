@@ -2,9 +2,9 @@
 #define FILE_H
 
 typedef enum {
-    FIRST_FILE,
-    SECOND_FILE,
-    THIRD_FILE
+    TEXT_FILE,
+    IMAGE,
+    HTML_FILE
 } FileType;
 
 int get_file_contents(FileType selected, char* buffer);

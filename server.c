@@ -9,9 +9,10 @@
 #include <sys/socket.h>
 
 #include "file.h"
+#include "env.h"
 
-int run_server(int sent_file) {
-    int debug = 0;
+int run_server(int sent_file, const char* file_location) {
+    const int debug = is_debug();
 
     int server_fd, client_fd;
     //TODO child processes
@@ -53,7 +54,7 @@ int run_server(int sent_file) {
     //Start listening for anyone attempting to connect
     listen(server_fd, MAX_CONNECTIONS);
 
-    printf("%s\n", "Server running...waiting for connections.");
+    printf("Server running...waiting for connections.\n");
 
     while(1) {
         client_address_length = sizeof(client_address);
@@ -64,8 +65,9 @@ int run_server(int sent_file) {
         char *ip = inet_ntoa(client_address.sin_addr);
         printf("%s from ip %s\n", "Received request...", ip);
         // pid = fork(); TODO
-
-        printf("sending \"%s\"\n", string_buffer);
+        if (debug)
+            printf("sending \"%s\"\n", string_buffer); {
+        }
         //Send string on buffer to client
         send(client_fd, &string_buffer, strlen(string_buffer) * sizeof(char), 0);
         //Shut down socket gracefully
