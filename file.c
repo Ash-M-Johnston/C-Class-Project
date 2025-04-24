@@ -3,36 +3,53 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-//todo pass the file location to here instead of this jank
+enum {
+    PLAIN_TEXT = 0,
+    HTML_TEXT = 1,
+    PNG_IMAGE = 2,
+    JPEG_IMAGE = 3
+} FileVariant;
 
-const FileDescriptor TEXT_FILE = {1, 0, "plain_text.txt", "text/plain" };
-const FileDescriptor IMAGE =  {0, 1, "image.png", "image/png" };
-const FileDescriptor HTML_FILE = {1, 2, "html_example.html", "text/html" };
-
-FileDescriptor fd_from_type(int type) {
-    FileDescriptor fd;
+SentFile fd_from_type(int type) {
+    SentFile sent_file;
     switch (type) {
-        case 0:
-            fd = TEXT_FILE;
+        case PLAIN_TEXT:
+            sent_file.filename = "plain_text.txt";
+            sent_file.html_type = "text/html";
+            sent_file.type = PLAIN_TEXT;
+            sent_file.is_text = 1;
             break;
-        case 1:
-            fd = IMAGE;
+        case HTML_TEXT:
+            sent_file.filename = "html_example.html";
+            sent_file.html_type = "text/html";
+            sent_file.type = HTML_TEXT;
+            sent_file.is_text = 1;
             break;
-        case 2:
-            fd = HTML_FILE;
+        case PNG_IMAGE:
+            sent_file.filename = "image.png";
+            sent_file.html_type = "image/png";
+            sent_file.type = PNG_IMAGE;
+            sent_file.is_text = 0;
+        break;
+        case JPEG_IMAGE:
+            sent_file.filename = "image.jpg";
+            sent_file.html_type = "image/jpeg";
+            sent_file.type = JPEG_IMAGE;
+            sent_file.is_text = 0;
             break;
         default:
-            fprintf(stderr, "Unknown FileDescriptor type: %d. Using default...\n", type);
-            fd = TEXT_FILE;
+            // fprintf(stderr, "Unknown FileDescriptor type: %d. Using plain text...\n", type);
+            SentFile sent4 = {1, 0, "plain_text.txt", "text/plain" };
+        sent_file = sent4;
             break;
     }
-    return fd;
+    return sent_file;
 }
 
 int get_file_contents(int selected, char* buffer) {
     char filename[100] = "../files/";
-    FileDescriptor fd = fd_from_type(selected);
-    strcat(filename, fd.filename);
+    SentFile sent_file = fd_from_type(selected);
+    strcat(filename, sent_file.filename);
     FILE* file = fopen(filename, "r");
     if (file == NULL) {
         fprintf(stderr, "Error opening file at location \"%s\".\n", filename);
@@ -43,7 +60,7 @@ int get_file_contents(int selected, char* buffer) {
     // snprintf(buffer, "%s", temp);
     //Build HTML information
     strcat(buffer,"HTTP/1.1 200 OK\r\nContent-Type:");
-    strcat(buffer, fd.html_type);
+    strcat(buffer, sent_file.html_type);
     strcat(buffer, "\r\n\r\n");
 
     while (fgets(temp, MAX_LENGTH, file)) {

@@ -1,4 +1,4 @@
-First file
+Some plain text
 
 
 Lorem ipsum dolor sit amet, consectetur adipiscing elit.
