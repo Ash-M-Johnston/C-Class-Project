@@ -6,7 +6,6 @@
 #include "server.h"
 
 int main(int argc, char **argv) {
-    int debug = is_debug();
     int var = 0;
     char ch;
     while ((ch = getopt(argc, argv, "?hf:")) != -1) {
@@ -18,7 +17,7 @@ int main(int argc, char **argv) {
             default: //Pass to h
             case '?': //Pass to h
             case 'h':
-                printf("Usage: %s [-h] [-f num] [number]\n-f num: Which file to send to the client (0-2).\nDefault is 0.\n", argv[0]);
+                printf("Usage: %s [-h] [-f num] [number]\n-f num: Which file to send to the client (0-2). 0 is plain text, 1 is html, 2 is image.\nDefault is 0.\n", argv[0]);
                 return 0;
         }
     }
@@ -27,7 +26,6 @@ int main(int argc, char **argv) {
 
 /*Currently missing from ruberic:
     Bitfields with structs
-    Environment variables
     malloc and free
     variadic function
  */

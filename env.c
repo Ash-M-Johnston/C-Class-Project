@@ -37,6 +37,9 @@ void printf_if_debug(char *fmt_str, ...) {
             case 's':
                 printf("%s", va_arg(args, char *));
                 break;
+            default:
+                printf("%c", *fmt_str);
+                break;
         }
     }
 }

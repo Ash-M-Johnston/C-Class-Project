@@ -1,6 +1,5 @@
-echo "Running Project..."
+echo "Running Project with args "$@""
 dir=${pwd}
 cd ./cmake-build-main/
-./Project
+./Project "$@"
 cd $pwd
-echo "Done!"
