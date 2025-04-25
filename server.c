@@ -81,7 +81,7 @@ void *client_connection(void *arg) {
             unsigned int response_len;
             char *response = malloc(MAX_LENGTH * 2 * sizeof(char));
             ResponseInfo *response_info = (ResponseInfo *)malloc(sizeof(ResponseInfo));
-            const char *path = files_path();
+            char *path = files_path();
             response_info->file_path = malloc(strlen(path) + 300);
             strcpy(response_info->file_path, path);
             strcat(response_info->file_path, filename);
