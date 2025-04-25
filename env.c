@@ -10,9 +10,9 @@ char *files_path() {
     char *env = getenv("PROJECT_FILES_PATH");
     if (env == NULL) {
         env = "../files/";
-        debug_printf("PROJECT_FILES_PATH env variable not set, default value of %s will be used.\n", env);
+        /*debug_*/printf("PROJECT_FILES_PATH env variable not set, default value of %s will be used.\n", env);
     }
-    char *path = malloc(strlen(env) + (200 * sizeof(char)));
+    char *path = malloc(strlen(env) + 200 * sizeof(char));
     strcpy(path, env);
 
     return path;
@@ -24,7 +24,7 @@ int is_debug() {
         return 0;
     }
     int is_debug = strcasecmp(env, "true");
-    if(strcmp(env, "1")) {
+    if(strcmp(env, "1") == 0) {
         is_debug = 1;
     }
     if (is_debug) {
@@ -65,6 +65,7 @@ void debug_printf(char *format, ...) {
                 break;
 
             case 's': s = va_arg(arg, char *); //Fetch string
+                if (s == NULL) break;
                 puts(s);
                 break;
         }

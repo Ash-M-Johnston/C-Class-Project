@@ -11,7 +11,7 @@ typedef struct {
 typedef struct {
     char *file_path;
     char *extension;
-    int mime_type:3;
+    int mime_type:4;
 } ResponseInfo;
 
 void get_file_extension(ResponseInfo *response_info);

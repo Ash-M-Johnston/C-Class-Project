@@ -36,15 +36,12 @@ void *client_connection(void *arg) {
             buffer[match[1].rm_eo] = '\0';
             //Create new pointer at the start of the match
             char *filename = buffer + match[1].rm_so;
-            printf("Filename: %s\n", filename);
+
+            //If nothing is specified, go to homepage
             if (strcmp(filename, "/") == 0 || strcmp(filename, "") == 0) {
-                printf("Filename is empty\n");
-                regfree(&regex);
-                close(client_fd);
-                free(arg);
-                free(buffer);
-                exit(0);
+                strcpy(filename, "home.html");
             }
+            printf("Filename: %s\n", filename);
 
             unsigned int response_len;
             char *response_buffer = malloc(MAX_LENGTH * 2 * sizeof(char));
