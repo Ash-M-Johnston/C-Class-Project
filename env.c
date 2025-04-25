@@ -6,14 +6,15 @@
 #include <stdarg.h>
 
 
-const char* files_path() {
+char *files_path() {
     char *env = getenv("PROJECT_FILES_PATH");
     if (env == NULL) {
         env = "../files/";
+        debug_printf("PROJECT_FILES_PATH env variable not set, default value of %s will be used.\n", env);
     }
     char *path = malloc(strlen(env) + (200 * sizeof(char)));
     strcpy(path, env);
-    printf("found path %s\n", path);
+
     return path;
 }
 
@@ -22,7 +23,7 @@ int is_debug() {
     if (env == NULL) {
         return 0;
     }
-    int is_debug = strcmp(env, "true");
+    int is_debug = strcasecmp(env, "true");
     if(strcmp(env, "1")) {
         is_debug = 1;
     }
@@ -33,27 +34,42 @@ int is_debug() {
     return 0;
 }
 
-void printf_if_debug(char *fmt_str, ...) {
-    if (!is_debug()) {
-        return;
-    }
-    va_list args;
-    for (va_start(args, fmt_str); *fmt_str != '\0'; fmt_str++) {
-        switch (*fmt_str) {
-            case 'd':
-                printf("%d", va_arg(args, int));
+void debug_printf(char *format, ...) {
+    unsigned int i;
+    char *s;
+
+    //Module 1: Initializing Myprintf's arguments
+    va_list arg;
+    va_start(arg, format);
+
+    for (char *traverse = format; *traverse != '\0'; traverse++) {
+        while (*traverse != '%') {
+            putchar(*traverse);
+            traverse++;
+        }
+
+        traverse++;
+
+        //Module 2: Fetching and executing arguments
+        switch (*traverse) {
+            case 'c': i = va_arg(arg, int); //Fetch char argument
+                putchar(i);
                 break;
-            case 'c':
-                printf("%c", va_arg(args, int));
+
+            case 'd': i = va_arg(arg, int); //Fetch Decimal/Integer argument
+                if (i < 0) {
+                    i = -i;
+                    putchar('-');
+                }
+                printf("%d", i);
                 break;
-            case 's':
-                printf("%s", va_arg(args, char *));
-                break;
-            default:
-                printf("%c", *fmt_str);
+
+            case 's': s = va_arg(arg, char *); //Fetch string
+                puts(s);
                 break;
         }
     }
+
+    //Module 3: Closing argument list to necessary clean-up
+    va_end(arg);
 }
-
-

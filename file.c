@@ -58,7 +58,7 @@ void build_response(char *response_buffer, ResponseInfo *info, unsigned int *buf
     char *header = malloc(MAX_LENGTH * sizeof(char));
     store_mime_type(info);
     snprintf(header, MAX_LENGTH,"HTTP/1.1 200 OK\r\nContent-Type: %s\r\n\r\n", char_mime_type(info));
-    printf("Opening file at location %s", info->file_path);
+    debug_printf("Opening file at location %s", info->file_path);
     FILE *file = fopen(info->file_path, "r");
 
     // Respond with 404 if file doesn't exist
@@ -70,10 +70,12 @@ void build_response(char *response_buffer, ResponseInfo *info, unsigned int *buf
         }*/
         snprintf(response_buffer, MAX_LENGTH,
          "HTTP/1.1 404 Not Found\r\n"
-         "Content-Type: text/plain\r\n"
+         "Content-Type: text/html\r\n"
          "\r\n"
-         "404 Not Found");
+         "<h1>Error 404:</h1>\r\n<p>File %s not found.", info->file_path);
         *buffer_length = strlen(response_buffer);
+        free(header);
+        debug_printf("Invalid file requested");
         return;
     }
 

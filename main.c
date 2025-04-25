@@ -27,9 +27,3 @@ int main(int argc, char **argv) {
     }
     return run_server(port);
 }
-
-/*Currently missing from ruberic:
-    Bitfields with structs
-    variadic function
- */
-//opt 1 for text, 2 for html, 3 for image

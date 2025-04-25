@@ -2,6 +2,10 @@
 #define ENV_H
 
 int is_debug();
-const char* files_path();
 
+char *files_path();
+
+void printf_if_debug(char *fmt_str, ...);
+
+void debug_printf(char *format, ...);
 #endif //ENV_H

@@ -14,47 +14,6 @@
 #include "file.h"
 #include "env.h"
 
-/*void *handle_client(void *arg) {
-    int client_fd = *((int *)arg);
-    char *buffer = (char *)malloc(BUFFER_SIZE * sizeof(char));
-
-    // receive request data from client and store into buffer
-    ssize_t bytes_received = recv(client_fd, buffer, BUFFER_SIZE, 0);
-    if (bytes_received > 0) {
-        // check if request is GET
-        regex_t regex;
-        regcomp(&regex, "^GET /([^ ]*) HTTP/1", REG_EXTENDED);
-        regmatch_t matches[2];
-
-        if (regexec(&regex, buffer, 2, matches, 0) == 0) {
-            // extract filename from request and decode URL
-            buffer[matches[1].rm_eo] = '\0';
-            const char *url_encoded_file_name = buffer + matches[1].rm_so;
-            char *file_name = url_decode(url_encoded_file_name);
-
-            // get file extension
-            char file_ext[32];
-            strcpy(file_ext, get_file_extension(file_name));
-
-            // build HTTP response
-            char *response = (char *)malloc(MAX_LENGTH * 2 * sizeof(char));
-            size_t response_len;
-            build_http_response(file_name, file_ext, response, &response_len);
-
-            // send HTTP response to client
-            send(client_fd, response, response_len, 0);
-
-            free(response);
-            free(file_name);
-        }
-        regfree(&regex);
-    }
-    close(client_fd);
-    free(arg);
-    free(buffer);
-    return NULL;
-}*/
-
 void *client_connection(void *arg) {
     printf("Client connected\n");
     int client_fd = *(int *) arg;
@@ -77,27 +36,32 @@ void *client_connection(void *arg) {
             buffer[match[1].rm_eo] = '\0';
             //Create new pointer at the start of the match
             char *filename = buffer + match[1].rm_so;
+            printf("Filename: %s\n", filename);
+            if (strcmp(filename, "/") == 0 || strcmp(filename, "") == 0) {
+                printf("Filename is empty\n");
+                regfree(&regex);
+                close(client_fd);
+                free(arg);
+                free(buffer);
+                exit(0);
+            }
 
             unsigned int response_len;
-            char *response = malloc(MAX_LENGTH * 2 * sizeof(char));
-            ResponseInfo *response_info = (ResponseInfo *)malloc(sizeof(ResponseInfo));
+            char *response_buffer = malloc(MAX_LENGTH * 2 * sizeof(char));
+            ResponseInfo *response_info = malloc(sizeof(ResponseInfo));
             char *path = files_path();
-            response_info->file_path = malloc(strlen(path) + 300);
+            response_info->file_path = malloc(strlen(path) + strlen(filename) + 300);
             strcpy(response_info->file_path, path);
             strcat(response_info->file_path, filename);
             free(path);
-            build_response(response, response_info, &response_len);
-            send(client_fd, response, response_len, 0);
-            free(response);
+            build_response(response_buffer, response_info, &response_len);
+            send(client_fd, response_buffer, response_len, 0);
+            free(response_buffer);
             free(response_info->file_path);
             free(response_info);
         }
         regfree(&regex);
     }
-    //Send string on buffer to client
-
-    //Shut down socket gracefully
-    // shutdown(client_fd, SHUT_WR);
     //Finally, close socket
     close(client_fd);
     free(arg);
@@ -105,7 +69,7 @@ void *client_connection(void *arg) {
     return NULL;
 }
 
-int run_server(int port) {
+int run_server(unsigned int port) {
     int server_fd;
     socklen_t client_address_length;
     struct sockaddr_in server_address, client_address;
@@ -148,9 +112,9 @@ int run_server(int port) {
             close(server_fd);
             return 1;
         }
-        printf("%s from ip %s\n", "Received request...", inet_ntoa(client_address.sin_addr));
+        printf("Received request from ip %s\n", inet_ntoa(client_address.sin_addr));
 
-        //Using multithreading
+        //Creates a new thread instead of a new instance of this program with fork
         pthread_t thread_id;
         pthread_create(&thread_id, NULL, (void*) client_connection, client_fd);
         pthread_detach(thread_id);

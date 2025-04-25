@@ -8,6 +8,6 @@
 
 #define MAX_CONNECTIONS 10
 
-int run_server(int port);
+int run_server(unsigned int port);
 
 #endif //SERVER_H
