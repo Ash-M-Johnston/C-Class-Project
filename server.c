@@ -55,52 +55,63 @@
     return NULL;
 }*/
 
-void *handle_client(void *arg) {
+void *client_connection(void *arg) {
     printf("Client connected\n");
     int client_fd = *(int *) arg;
-    // regex_t regex;
-    // regcomp(&regex, "GET localhost\?([a-z0-9]+)=(.+)(&([a-z0-9]+)=(.+))*", REG_EXTENDED);
+    char *buffer = malloc(MAX_LENGTH * sizeof(char));
+    //Read received buffer,
+    ssize_t bytes = recv(client_fd, buffer, MAX_LENGTH, 0);
+    if (bytes > 0) {
+        printf("Client thing\n");
+        //Regex to check if the response is an HTML GET request
+        regex_t regex;
+        //Compile regex
+        regcomp(&regex, "GET /([^ ]*) HTTP/1.", REG_EXTENDED);
+        //First index will be entire match, second will just be the file the client is requesting
+        regmatch_t match[2];
+        int result = regexec(&regex, buffer, 2, match, 0);
+        //Execute regex
+        if (result == 0) {
+            printf("Match found\n");
+            //Cut off buffer at the end of the found match
+            buffer[match[1].rm_eo] = '\0';
+            //Create new pointer at the start of the match
+            char *filename = buffer + match[1].rm_so;
 
-    char *buffer = (char *)malloc(MAX_LENGTH * sizeof(char));
-    strcat(buffer, "Hello from client");
-    ssize_t bytes_received;
-    if ((bytes_received = recv(client_fd, buffer, MAX_LENGTH, 0)) < 0) {
-        fprintf(stderr, "Error receiving data from client: %s\n", strerror(errno));
-    }
-    if (bytes_received > 0) {
-        printf("BUFFER: %s\n", buffer);
-        send(client_fd, &buffer, strlen(buffer) * sizeof(char), 0);
+            unsigned int response_len;
+            char *response = malloc(MAX_LENGTH * 2 * sizeof(char));
+            ResponseInfo *response_info = (ResponseInfo *)malloc(sizeof(ResponseInfo));
+            const char *path = files_path();
+            response_info->file_path = malloc(strlen(path) + 300);
+            strcpy(response_info->file_path, path);
+            strcat(response_info->file_path, filename);
+            free(path);
+            build_response(response, response_info, &response_len);
+            send(client_fd, response, response_len, 0);
+            free(response);
+            free(response_info->file_path);
+            free(response_info);
+        }
+        regfree(&regex);
     }
     //Send string on buffer to client
 
     //Shut down socket gracefully
-    shutdown(client_fd, SHUT_WR);
+    // shutdown(client_fd, SHUT_WR);
     //Finally, close socket
     close(client_fd);
-    free(buffer);
     free(arg);
+    free(buffer);
     return NULL;
 }
 
 int run_server(int port) {
-    const int debug = is_debug();
-    int server_fd, client_fd;
-    //TODO child processes
-    pid_t pid;
-    //What is sent to the client
-    char sent_buffer[MAX_LENGTH];
+    int server_fd;
     socklen_t client_address_length;
     struct sockaddr_in server_address, client_address;
 
     if ((server_fd = socket(AF_INET, SOCK_STREAM, 0)) <= 0) {
-        fprintf(stderr, "Socket failed with code %d: %s\n", errno, strerror(errno));
-        return 1;
-    }
-
-    //Memset to clear the junk values stored in the memory address, just in case
-    // memset(&server_address, 0, sizeof(server_address));
-    if (get_file_contents(port, sent_buffer) != 0) {
-        fprintf(stderr, "Failed to read file contents. Aborting...\n");
+        fprintf(stderr, "Socket failed to open with code %d: %s\n", errno, strerror(errno));
         return 1;
     }
 
@@ -108,7 +119,7 @@ int run_server(int port) {
     //AF_INET means it's using IPv4
     server_address.sin_family = AF_INET;
     //Allow all incoming addresses
-    server_address.sin_addr.s_addr = SO_REUSEADDR;
+    server_address.sin_addr.s_addr = INADDR_ANY;/*SO_REUSEADDR;*/
     //Convert port to big endian ordering (most significant value first)
     server_address.sin_port = htons(port);
 
@@ -131,38 +142,18 @@ int run_server(int port) {
 
     while(1) {
         client_address_length = sizeof(client_address);
-        if ((client_fd = accept(server_fd, (struct sockaddr*) &client_address, &client_address_length)) < 0) {
+        int *client_fd = malloc(sizeof(int));
+        if ((*client_fd = accept(server_fd, (struct sockaddr*) &client_address, &client_address_length)) < 0) {
             fprintf(stderr, "Accept failed with code %d: %s\n", errno, strerror(errno));
+            close(server_fd);
             return 1;
         }
-        char *ip = inet_ntoa(client_address.sin_addr);
-        printf("%s from ip %s\n", "Received request...", ip);
+        printf("%s from ip %s\n", "Received request...", inet_ntoa(client_address.sin_addr));
 
-        if (debug)
-            printf("sending \"%s\"\n", sent_buffer); {
-        }
-        pid = fork(); //TODO
-        if (pid < 0) {
-            fprintf(stderr, "Fork failed with code %d: %s\n", errno, strerror(errno));
-            shutdown(client_fd, SHUT_WR);
-            close(client_fd);
-            return 1;
-        }
+        //Using multithreading
         pthread_t thread_id;
-        pthread_create(&thread_id, NULL, (void*) handle_client, (void *)client_fd);
+        pthread_create(&thread_id, NULL, (void*) client_connection, client_fd);
         pthread_detach(thread_id);
-        // char *buffer = (char *)malloc(MAX_LENGTH * sizeof(char));
-        // ssize_t bytes_received = recv(client_fd, buffer, MAX_LENGTH, 0);
-        // if (bytes_received > 0) {
-        //     printf("BUFFER: %s\n", buffer);
-        // }
-        // //Send string on buffer to client
-        // send(client_fd, &sent_buffer, strlen(sent_buffer) * sizeof(char), 0);
-        // //Shut down socket gracefully
-        // shutdown(client_fd, SHUT_WR);
-        // //Finally, close socket
-        // close(client_fd);
-        // free(buffer);
     }
     //close listening socket
     close(server_fd);

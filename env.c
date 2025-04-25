@@ -5,6 +5,18 @@
 #include <string.h>
 #include <stdarg.h>
 
+
+const char* files_path() {
+    char *env = getenv("PROJECT_FILES_PATH");
+    if (env == NULL) {
+        env = "../files/";
+    }
+    char *path = malloc(strlen(env) + (200 * sizeof(char)));
+    strcpy(path, env);
+    printf("found path %s\n", path);
+    return path;
+}
+
 int is_debug() {
     const char *env = getenv("DEBUG");
     if (env == NULL) {

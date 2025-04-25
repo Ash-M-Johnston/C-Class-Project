@@ -30,7 +30,6 @@ int main(int argc, char **argv) {
 
 /*Currently missing from ruberic:
     Bitfields with structs
-    malloc and free
     variadic function
  */
 //opt 1 for text, 2 for html, 3 for image

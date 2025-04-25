@@ -9,4 +9,5 @@ add_executable(Project main.c
         file.c
         file.h
         env.c
-        env.h)
+        env.h
+)
