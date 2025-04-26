@@ -21,7 +21,10 @@ int main(int argc, char **argv) {
             default: //Pass to h
             case '?': //Pass to h
             case 'h':
-                printf("Usage: %s [-h] [-p port] [number]\n-p port: Which port to host the server on.\nDefault is 8080.\n", argv[0]);
+                printf("Usage: %s [-h] [-p port] [number]\n"
+                       "-p port: Which port to host the server on.\n"
+                       "Default is 8080.\n"
+                       "Valid Environment variables: DEBUG", argv[0]);
                 return 0;
         }
     }

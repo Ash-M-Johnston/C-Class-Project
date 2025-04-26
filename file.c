@@ -65,16 +65,14 @@ void build_response(char *response_buffer, ResponseInfo *info, unsigned int *buf
 
     // Respond with 404 if file doesn't exist
     if (file == NULL) {
-        /*long bytes_read;
-        while ((bytes_read = read(fileno(file),response_buffer + *buffer_length,
-                                MAX_LENGTH - *buffer_length)) > 0) {
-            *buffer_length += bytes_read;
-        }*/
         snprintf(response_buffer, MAX_LENGTH,
          "HTTP/1.1 404 Not Found\r\n"
          "Content-Type: text/html\r\n"
          "\r\n"
-         "<h1>Error 404:</h1>\r\n<p>File %s not found.", info->file_path);
+         "<h1>Error 404:</h1>\r\n"
+         "<p>File %s not found.\r\n"
+         "<br>\r\n"
+         "<img src=\"sad.jpg\" alt=\"A sad face\" style=\"width:320px;height:320px;\">\"", info->file_path);
         *buffer_length = strlen(response_buffer);
         free(header);
         printf("Invalid file requested\n");
