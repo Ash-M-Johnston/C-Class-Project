@@ -1,4 +1,3 @@
-
 #include "server.h"
 
 #include <errno.h>
@@ -13,6 +12,7 @@
 
 #include "file.h"
 #include "env.h"
+#include <signal.h>
 
 void *client_connection(void *arg) {
     printf("Client connected\n");
@@ -21,10 +21,8 @@ void *client_connection(void *arg) {
     //Read received buffer,
     ssize_t bytes = recv(client_fd, buffer, MAX_LENGTH, 0);
     if (bytes > 0) {
-        printf("Client thing\n");
-        //Regex to check if the response is an HTML GET request
         regex_t regex;
-        //Compile regex
+        //Regex to check if the response is an HTML GET request
         regcomp(&regex, "GET /([^ ]*) HTTP/1.", REG_EXTENDED);
         //First index will be entire match, second will just be the file the client is requesting
         regmatch_t match[2];
@@ -65,11 +63,26 @@ void *client_connection(void *arg) {
     free(buffer);
     return NULL;
 }
+//Global so sigint_handler can properly shut down the socket when the process is killed
+int server_fd;
+struct sigaction old_action;
+
+void signal_handler(const int sig_num) {
+    printf("Program terminated, safely closing the server...\n");
+    sigaction(sig_num, &old_action, NULL);
+    close(server_fd);
+    kill(0, sig_num);
+}
 
 int run_server(unsigned int port) {
-    int server_fd;
     socklen_t client_address_length;
     struct sockaddr_in server_address, client_address;
+
+    //Makes sure the server properly shuts down when Ctrl + C is pressed
+    struct sigaction action = {0};
+    action.sa_handler = &signal_handler;
+    sigaction(SIGTERM, &action, &old_action);
+    sigaction(SIGINT, &action, &old_action);
 
     if ((server_fd = socket(AF_INET, SOCK_STREAM, 0)) <= 0) {
         fprintf(stderr, "Socket failed to open with code %d: %s\n", errno, strerror(errno));
