@@ -72,7 +72,7 @@ void build_response(char *response_buffer, ResponseInfo *info, unsigned int *buf
          "<h1>Error 404:</h1>\r\n"
          "<p>File %s not found.\r\n"
          "<br>\r\n"
-         "<img src=\"sad.jpg\" alt=\"A sad face\" style=\"width:320px;height:320px;\">\"", info->file_path);
+         "<img src=\"/sad.jpg\" alt=\"A sad face\" style=\"width:320px;height:320px;\">", info->file_path);
         *buffer_length = strlen(response_buffer);
         free(header);
         printf("Invalid file requested\n");
