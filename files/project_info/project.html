@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Basic Web Server</title>
+    <style>
+        body {
+            font-family: Arial, serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+        header {
+            background-color: #333;
+            color: white;
+            text-align: center;
+            padding: 20px;
+        }
+        .container {
+            width: 80%;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: white;
+            border-radius: 8px;
+        }
+        h2 {
+            color: #333;
+            font-size: 28px;
+        }
+        h1 {
+            font-size: 36px;
+            color: #e3e3e3;
+        }
+        p {
+            margin-bottom: 20px;
+            font-size: 18px;
+        }
+        code {
+            background-color: #f1f1f1;
+            padding: 5px;
+            font-size: 18px;
+            font-family: Consolas, monaco, monospace;
+        }
+        footer {
+            text-align: center;
+            padding: 20px;
+            background-color: #333;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+<header>
+    <h1>Basic Web Server</h1>
+</header>
+
+<div class="container">
+    <section>
+        <h2>What is a Web Server?</h2>
+        <p>
+            At it's core, a web server hosts files for users to request, usually with their browsers.
+        </p>
+    </section>
+
+    <section>
+        <h2>How does it work?</h2>
+        <p>
+            <!--put text here?-->
+        </p>
+        <ol>
+            <li>The server opens a socket and starts listening on a specific port.</li>
+            <li>A client attempts to connect by sending a GET request to the server at that port.</li>
+            <li>The server processes the request and either sends back the requested file, or provides an error message if it doesn't exist.</li>
+            <li>After everything is sent, the server closes the connection to the client, allowing for more connections to be opened.</li>
+        </ol>
+    </section>
+
+    <section>
+        <h2>Some files on the server</h2>
+        <p>
+            <a href="../html_example.html">Example page</a>
+        </p>
+        <p>Some beautiful art</p>
+        <img src="/image.png" alt="A placeholder image" style="width:400px;height:200px;">
+<!--        <ul>
+            <li>Submitting sensitive information, such as passwords or payment details.</li>
+            <li>Creating or updating resources (e.g., user profiles, blog posts, comments).</li>
+            <li>Performing actions that have side effects on the server, such as placing an order or sending a message.</li>
+        </ul>-->
+    </section>
+</div>
+
+<footer>
+
+</footer>
+
+</body>
+</html>
