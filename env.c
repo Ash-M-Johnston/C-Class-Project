@@ -38,7 +38,7 @@ void debug_printf(char *format, ...) {
     unsigned int i;
     char *s;
 
-    //Module 1: Initializing Myprintf's arguments
+    //initialize args
     va_list arg;
     va_start(arg, format);
 
@@ -50,7 +50,7 @@ void debug_printf(char *format, ...) {
 
         traverse++;
 
-        //Module 2: Fetching and executing arguments
+        //execute arguments
         switch (*traverse) {
             case 'c': i = va_arg(arg, int); //Fetch char argument
                 putchar(i);
@@ -71,6 +71,6 @@ void debug_printf(char *format, ...) {
         }
     }
 
-    //Module 3: Closing argument list to necessary clean-up
+    //end vararg
     va_end(arg);
 }
