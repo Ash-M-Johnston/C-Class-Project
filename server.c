@@ -13,6 +13,7 @@
 #include "file.h"
 #include "env.h"
 #include <signal.h>
+#include <time.h>
 
 void *client_connection(void *arg) {
     printf("Client connected\n");
@@ -122,7 +123,10 @@ int run_server(unsigned int port) {
             close(server_fd);
             return 1;
         }
-        printf("Received request from ip %s\n", inet_ntoa(client_address.sin_addr));
+        time_t t;
+        time(&t);
+        struct tm * timeinfo = localtime(&t);
+        printf("[%s] Received request from ip %s\n", asctime(timeinfo), inet_ntoa(client_address.sin_addr));
 
         //Creates a new thread instead of a new instance of this program with fork
         pthread_t thread_id;
